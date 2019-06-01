@@ -1,15 +1,16 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+
+const imageRouter = require('./routes/image');
+
 const app = express();
 
-/**
- * Routes:
- * -  GET:    Fetch Image
- * -  POST:   Uploads Image
- * -  PUT:    Edit Image
- * -  DELETE: Removes Image
- */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/img/:name', (req, res) => {});
-app.post('/img/:name', (req, res) => {});
-app.put('/img/:name', (req, res) => {});
-app.delete('/img/:name', (req, res) => {});
+imageRouter(app);
+
+app.listen(
+  8080,
+  () => console.log('Listening...'),
+);
