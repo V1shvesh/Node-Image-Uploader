@@ -22,7 +22,6 @@ const key = 'test.jpg';
 const fileURL = 'http://testurl.com/';
 before(async () => {
   uri = await mongod.getConnectionString();
-  console.log(uri + 'images');
   mongoose.connect(uri + 'images', { useNewUrlParser: true });
 });
 
