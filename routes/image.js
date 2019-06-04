@@ -5,45 +5,56 @@
  * -  PUT:    Edit Image
  * -  DELETE: Removes Image
  */
-const path = require('path');
 const mongoose = require('mongoose');
-const fs = require('fs');
 
 const { Image } = require('../models/image');
-const uploadGet = require('../config/multer.config');
+const { upload, deleteImage } = require('../config/aws.config');
 
 function imageRouter(app) {
   // Connect to database
   mongoose.connect('mongodb://localhost:27017/images', { useNewUrlParser: true })
     .catch(() => console.error('Not Connected :('));
 
-  app.get('/img/:filename', (req, res) => {
-    const { filename } = req.params;
+  app.get('/img/:key', (req, res) => {
+    const { key } = req.params;
     Image.findOne(
       {
-        fileName: filename,
+        key,
       }, {
         _id: 0,
         fileURL: 1,
       }, (err, doc) => {
-        res.json({ location: doc.fileURL });
+        if (err) {
+          return res.status(500);
+        }
+
+        if (doc) {
+          return res.status(200).json({ location: doc.fileURL });
+        }
+
+        return res.status(404).send('File not found!');
       },
     );
   });
 
-  app.post('/img', uploadGet.single('image'), (req, res) => {
+  app.post('/img', upload.single('image'), async (req, res) => {
     const {
-      originalName,
+      originalname,
       size,
       location,
+      key,
     } = req.file;
     const newImage = new Image({
-      name: originalName,
+      name: originalname,
       size,
+      key,
       fileURL: location,
     });
-
-    newImage.save();
+    try {
+      await newImage.save();
+    } catch (error) {
+      res.status(500).json(error);
+    }
 
     if (!req.file) {
       res.status(400).end();
@@ -84,18 +95,24 @@ function imageRouter(app) {
   //   );
   });
 
-  app.delete('/img/:filename', (req, res) => {
-    const { filename } = req.params;
+  app.delete('/img/:key', (req, res) => {
+    const { key } = req.params;
     Image.findOneAndDelete(
       {
-        fileName: filename,
+        key,
       }, {
         _id: 0,
-        filePath: 1,
+        key: 1,
       }, (err, doc) => {
-        fs.unlink(path.join(__dirname, '..', doc.filePath), () => {
-          res.send('Deleted file');
-        });
+        if (err) {
+          return res.status(500);
+        }
+
+        if (doc) {
+          return deleteImage(res, key);
+        }
+
+        return res.status(404).send('Image not found');
       },
     );
   });
