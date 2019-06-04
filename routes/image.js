@@ -95,7 +95,7 @@ function imageRouter(app) {
         _id: 0,
         filePath: 1,
       }, (err, doc) => {
-        fs.unlink(path.join(__dirname, '..', doc.filePath), (err) => {
+        fs.unlink(path.join(__dirname, '..', doc.filePath), () => {
           res.send('Deleted file');
         });
       },
