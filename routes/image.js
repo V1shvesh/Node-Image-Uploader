@@ -5,41 +5,102 @@
  * -  PUT:    Edit Image
  * -  DELETE: Removes Image
  */
-const multer = require('multer');
+const path = require('path');
+const mongoose = require('mongoose');
+const fs = require('fs');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './public/images');
-  },
-});
-
-const upload = multer({
-  storage,
-  fileFilter(req, file, cb) {
-    if (file.mimetype === 'image/jpeg') {
-      cb(null, `img-${Date.now()}-${req.params.name}.jpg`);
-    }
-  },
-  limits: {
-    fileSize: 10 * 1024 * 1024,
-  },
-});
+const { Image } = require('../models/image');
+const uploadGet = require('../config/multer.config');
 
 function imageRouter(app) {
-  app.get('/img/:name', (req, res) => {});
+  // Connect to database
+  mongoose.connect('mongodb://localhost:27017/images', { useNewUrlParser: true })
+    .catch(() => console.error('Not Connected :('));
 
-  app.post('/img/:name', upload.single('image'), (req, res) => {
-    console.log(`File recieved: ${JSON.stringify(req.file)}`);
+  app.get('/img/:filename', (req, res) => {
+    const { filename } = req.params;
+    Image.findOne(
+      {
+        fileName: filename,
+      }, {
+        _id: 0,
+        filePath: 1,
+      }, (err, doc) => {
+        res.sendFile(path.join(__dirname, '..', doc.filePath));
+      },
+    );
+  });
+
+  app.post('/img', uploadGet.single('image'), (req, res) => {
+    const {
+      originalName,
+      size,
+      path: filePath, // Destructured and aliased
+      filename,
+    } = req.file;
+    const newImage = new Image({
+      name: originalName,
+      size,
+      filePath,
+      fileName: filename,
+    });
+
+    newImage.save();
 
     if (!req.file) {
       res.status(400).end();
     }
-    res.json({ fileUrl: `http://192.168.0.7:3000/images/${req.file.filename}` });
+    res.status(200).json({ fileUrl: `http://localhost:8080/img/${req.file.filename}` });
   });
 
-  app.put('/img/:name', (req, res) => {});
+  app.put('/img/:filename', (req, res) => {
+    res.end('Under construction');
+    //   const { filename } = req.params;
+    //   Image.findOne(
+    //     {
+    //       fileName: filename,
+    //     }, {
+    //       _id: 0,
+    //       filePath: 1,
+    //     }, (err, doc) => {
+    //       const upload = multer({
+    //         storage: multer.diskStorage({
+    //           path(_, file, cb) {
+    //             res.write(`${JSON.stringify(filename)}\n`);
+    //             if (file.mimetype === 'image/jpeg') {
+    //               cb(null, path.join(__dirname, '..', doc.filePath));
+    //             } else {
+    //               cb(new Error('Invalid filetype'));
+    //             }
+    //           },
+    //         }),
+    //         limits: {
+    //           fileSize: 10 * 1024 * 1024,
+    //         },
+    //       }).single('image');
 
-  app.delete('/img/:name', (req, res) => {});
+  //       upload(req, res, () => {
+  //         res.end('File Modified');
+  //       });
+  //     },
+  //   );
+  });
+
+  app.delete('/img/:filename', (req, res) => {
+    const { filename } = req.params;
+    Image.findOneAndDelete(
+      {
+        fileName: filename,
+      }, {
+        _id: 0,
+        filePath: 1,
+      }, (err, doc) => {
+        fs.unlink(path.join(__dirname, '..', doc.filePath), (err) => {
+          res.send('Deleted file');
+        });
+      },
+    );
+  });
 }
 
 module.exports = imageRouter;
