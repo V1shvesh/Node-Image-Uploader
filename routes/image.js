@@ -14,10 +14,6 @@ const errorHandler = require('../handlers/errorHandler');
 
 const imageRouter = express.Router();
 
-// Connect to database
-mongoose.connect('mongodb://localhost:27017/images', { useNewUrlParser: true })
-  .catch(() => console.error('Not Connected :('));
-
 imageRouter.get('/:key', (req, res) => {
   const { key } = req.params;
   Image.findOne(
