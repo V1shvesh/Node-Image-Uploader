@@ -24,7 +24,7 @@ const storage = multerS3({
   },
 });
 
-module.exports = multer({
+exports.upload = multer({
   storage,
   limits: {
     fileSize: 10 * 1024 * 1024,
@@ -37,3 +37,16 @@ module.exports = multer({
     }
   },
 });
+
+exports.deleteImage = (res, Key) => {
+  s3.deleteObject({
+    Bucket: 'profile-pic-exercise',
+    Key,
+  }, (err) => {
+    if (err) {
+      res.status(502).send('Unable to delete file');
+    }
+
+    res.status(200).send('File deleted');
+  });
+};
