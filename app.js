@@ -7,10 +7,6 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/img', imageRouter);
 
-imageRouter(app);
-
-app.listen(
-  8080,
-  () => console.log('Listening...'),
-);
+module.exports = app;
