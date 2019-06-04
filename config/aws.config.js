@@ -33,7 +33,7 @@ exports.upload = multer({
     if (file.mimetype === 'image/jpeg') {
       cb(null, true);
     } else {
-      cb(new Error('Invalid File Type'));
+      cb(new Error('Invalid File Type'), false);
     }
   },
 });
