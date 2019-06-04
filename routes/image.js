@@ -62,39 +62,6 @@ function imageRouter(app) {
     res.status(200).json({ location });
   });
 
-  app.put('/img/:filename', (req, res) => {
-    res.end('Under construction');
-    //   const { filename } = req.params;
-    //   Image.findOne(
-    //     {
-    //       fileName: filename,
-    //     }, {
-    //       _id: 0,
-    //       filePath: 1,
-    //     }, (err, doc) => {
-    //       const upload = multer({
-    //         storage: multer.diskStorage({
-    //           path(_, file, cb) {
-    //             res.write(`${JSON.stringify(filename)}\n`);
-    //             if (file.mimetype === 'image/jpeg') {
-    //               cb(null, path.join(__dirname, '..', doc.filePath));
-    //             } else {
-    //               cb(new Error('Invalid filetype'));
-    //             }
-    //           },
-    //         }),
-    //         limits: {
-    //           fileSize: 10 * 1024 * 1024,
-    //         },
-    //       }).single('image');
-
-  //       upload(req, res, () => {
-  //         res.end('File Modified');
-  //       });
-  //     },
-  //   );
-  });
-
   app.delete('/img/:key', (req, res) => {
     const { key } = req.params;
     Image.findOneAndDelete(
