@@ -5,7 +5,6 @@
  * -  PUT:    Edit Image
  * -  DELETE: Removes Image
  */
-const mongoose = require('mongoose');
 const express = require('express');
 
 const { Image } = require('../models/image');
