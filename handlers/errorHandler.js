@@ -1,4 +1,4 @@
-module.exports = function errorHandler(err, req, res, next) {
+module.exports = function errorHandler(err, req, res) {
   if (err.message === 'Invalid File Type') {
     res.status(400).json({
       status: 400,
@@ -8,6 +8,6 @@ module.exports = function errorHandler(err, req, res, next) {
 
   res.status(500).json({
     status: 500,
-    message: err.message,
+    message: 'Internal Server Error',
   });
 };

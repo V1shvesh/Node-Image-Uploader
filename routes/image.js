@@ -13,7 +13,7 @@ const errorHandler = require('../handlers/errorHandler');
 
 const imageRouter = express.Router();
 
-imageRouter.get('/:key', (req, res) => {
+imageRouter.get('/:key', (req, res, next) => {
   const { key } = req.params;
   Image.findOne(
     {
@@ -21,21 +21,27 @@ imageRouter.get('/:key', (req, res) => {
     }, {
       _id: 0,
       fileURL: 1,
+      key: 1,
+      timestamp: 1,
+      size: 1,
     }, (err, doc) => {
       if (err) {
-        return res.status(500);
+        next(err);
       }
 
       if (doc) {
-        return res.status(200).json({ location: doc.fileURL });
+        return res.status(200).json({ ...doc });
       }
 
-      return res.status(404).send('File not found!');
+      return res.status(404).json({
+        status: '404',
+        message: 'Image not found',
+      });
     },
   );
 });
 
-imageRouter.post('/', upload.single('image'), async (req, res) => {
+imageRouter.post('/', upload.single('image'), async (req, res, next) => {
   const {
     originalname,
     size,
@@ -51,15 +57,19 @@ imageRouter.post('/', upload.single('image'), async (req, res) => {
   try {
     await newImage.save();
   } catch (error) {
-    res.status(500).json(error);
+    next(error);
   }
 
   if (!req.file) {
-    res.status(400).end();
+    res.status(400).json({
+      status: 400,
+      message: 'File Not Specified',
+    });
   }
-  res.status(200).json({ location });
+  res.status(200).json({ fileURL: location });
 });
 
+// Handle Doc re-insertion at 502 error. Refactor.
 imageRouter.delete('/:key', (req, res, next) => {
   const { key } = req.params;
   Image.findOneAndDelete(

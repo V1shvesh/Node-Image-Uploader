@@ -2,6 +2,7 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
 require('dotenv').config();
+
 const {
   AWS_ACCESS_KEY,
   AWS_SECRET_ACCESS_KEY,
@@ -45,7 +46,10 @@ exports.deleteImage = (res, Key) => {
     Key,
   }, (err) => {
     if (err) {
-      res.status(502).send('Unable to delete file');
+      res.status(502).json({
+        status: 502,
+        message: 'Unable to delete file',
+      });
     }
 
     res.status(200).send('File deleted');
