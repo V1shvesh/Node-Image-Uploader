@@ -13,12 +13,14 @@ Represents an image file hosted on S3.
   Get Image identified by `key`.
 
   **Parameters:**
+  
   | Parameters | Required/Optional | Type    | Description                    |
   |------------|-------------------|---------|--------------------------------|
-  | Path Params                                                               |
+  | **Path Params**                                                           |
   | `key`      | Required          | String  | Identifies Image to be fetched.|
 
   **Response:**
+  
   | Property     | Type      | Description                                        |
   |--------------|-----------|----------------------------------------------------|
   | __200__                                                                       |
@@ -35,12 +37,14 @@ Represents an image file hosted on S3.
   Upload Image.
 
   **Parameters**
+  
   | Parameters | Required/Optional | Type    | Description                    |
   |------------|-------------------|---------|--------------------------------|
-  | Body Params                                                               |
+  | **Body Params**                                                           |
   | `image`    | Required          | File    | Image file to be uploaded.     |
 
   **Response:**
+  
   | Property     | Type      | Description                                        |
   |--------------|-----------|----------------------------------------------------|
   | __200__                                                                       |
@@ -54,12 +58,14 @@ Represents an image file hosted on S3.
   Delete Image identified by 'key'.
   
   **Parameters**
+  
   | Parameters | Required/Optional | Type    | Description                    |
   |------------|-------------------|---------|--------------------------------|
-  | Path Params                                                               |
+  | **Path Params**                                                           |
   | `key`      | Required          | String  | Identifies Image to be deleted.|
 
   **Response:**
+  
   | Property     | Type      | Description                                        |
   |--------------|-----------|----------------------------------------------------|
   | __200__                                                                       |
