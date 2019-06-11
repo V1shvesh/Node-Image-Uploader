@@ -2,11 +2,12 @@ process.env.NODE_ENV = 'test';
 
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server-global');
-const {Image} = require('../models/image');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const expect = chai.expect;
+const { Image } = require('../models/image');
+
+const { expect } = chai;
 
 const app = require('../app');
 
@@ -22,7 +23,7 @@ const key = 'test.jpg';
 const fileURL = 'http://testurl.com/';
 before(async () => {
   uri = await mongod.getConnectionString();
-  mongoose.connect(uri + 'images', { useNewUrlParser: true });
+  mongoose.connect(`${uri}images`, { useNewUrlParser: true });
 });
 
 beforeEach(() => {
@@ -34,12 +35,11 @@ beforeEach(() => {
     fileURL,
   });
   newImage.save();
-})
+});
 
 
 // Tests for GET Endpoint
 describe('GET', () => {
-
   it('should return 404 for non-existent image', (done) => {
     chai.request(app)
       .get('/img/wah.jpg')
